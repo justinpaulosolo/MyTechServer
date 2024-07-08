@@ -7,7 +7,7 @@ namespace MyTech.Services;
 public interface ICollectionsService
 {
     Task<IEnumerable<CollectionDTO>> GetCollectionAsync();
-    Task<CollectionDTO> GetCollectionByIdAsync(int id);
+    Task<CollectionDTO?> GetCollectionByIdAsync(int id);
     Task<CollectionDTO> CreateCollectionAsync(CollectionDTO collectionDto);
     Task<CollectionDTO> UpdateCollectionAsync(CollectionDTO collectionDto);
     Task DeleteCollectionAsync(int id);
@@ -23,9 +23,11 @@ public class CollectionsService(ApplicationDbContext context) : ICollectionsServ
         throw new NotImplementedException();
     }
 
-    public async Task<CollectionDTO> GetCollectionByIdAsync(int id)
+    public async Task<CollectionDTO?> GetCollectionByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        var collection = await _context.Collections.FindAsync(id);
+        
+        return collection?.ToCollectionDTO();
     }
 
     public async Task<CollectionDTO> CreateCollectionAsync(CollectionDTO collectionDto)

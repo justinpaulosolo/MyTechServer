@@ -37,7 +37,7 @@ public class CollectionsController(ICollectionsService collectionsService, UserM
         return CreatedAtAction(nameof(GetCollection), new {id = createdCollection.CollectionId}, createdCollection);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     [Authorize]
     public async Task<IActionResult> GetCollection(int id)
     {
