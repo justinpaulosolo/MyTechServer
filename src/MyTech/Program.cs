@@ -1,4 +1,5 @@
 using MyTech;
+using MyTech.Data;
 using MyTech.Domain;
 
 var builder = WebApplication.CreateBuilder(args);
