@@ -29,7 +29,16 @@ public class CollectionsService(ApplicationDbContext context) : ICollectionsServ
     {
         var collection = await _context.Collections.FindAsync(id);
         
-        return collection?.ToCollectionDTO();
+        if (collection == null)
+            return null;
+        
+        return new CollectionDTO
+        {
+            CollectionId = collection.CollectionId,
+            CollectionName = collection.CollectionName,
+            CreatedAt = collection.CreatedAt,
+            ModifiedAt = collection.ModifiedAt,
+        };
     }
 
     public async Task<CollectionDTO> CreateCollectionAsync(CollectionDTO collectionDto)
@@ -43,7 +52,13 @@ public class CollectionsService(ApplicationDbContext context) : ICollectionsServ
         await _context.Collections.AddAsync(collection);
         await _context.SaveChangesAsync();
         
-        return collection.ToCollectionDTO();
+        return new CollectionDTO
+        {
+            CollectionId = collection.CollectionId,
+            CollectionName = collection.CollectionName,
+            CreatedAt = collection.CreatedAt,
+            ModifiedAt = collection.ModifiedAt,
+        };
     }
 
     public async Task<CollectionDTO> UpdateCollectionAsync(CollectionDTO collectionDto)
@@ -53,7 +68,7 @@ public class CollectionsService(ApplicationDbContext context) : ICollectionsServ
 
     public async Task<ItemDTO> AddItemToCollectionAsync(int itemId, int collectionId)
     {
-        var collection = await _context.Collections.Include(c => c.CollectionItems)
+        var collection = await _context.Collections.Include(c => c.Items)
             .FirstOrDefaultAsync(c => c.CollectionId == collectionId);
         
         var item = await _context.Items.FirstOrDefaultAsync(i => i.ItemId == itemId);
@@ -64,15 +79,8 @@ public class CollectionsService(ApplicationDbContext context) : ICollectionsServ
         if (item == null)
             throw new InvalidOperationException("Item not found");
         
-        var collectionItem = new CollectionItem
-        {
-            CollectionId = collectionId,
-            ItemId = item.ItemId
-        };
+        collection.Items.Add(item);
         
-        collection.CollectionItems.Add(collectionItem);
-        
-        await _context.CollectionItems.AddAsync(collectionItem);
         await _context.SaveChangesAsync();
         
         return new ItemDTO

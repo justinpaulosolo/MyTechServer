@@ -33,7 +33,19 @@ public class ItemsService : IItemsService
     {
         var item = await _context.Items.FindAsync(id);
         
-        return item?.ToItemDTO();
+        if (item == null)
+            return null;
+        
+        return new ItemDTO
+        {
+            ItemId = item.ItemId,
+            ItemName = item.ItemName,
+            ItemDescription = item.ItemDescription,
+            ItemUrl = item.ItemUrl,
+            CollectionId = item.CollectionId,
+            CreatedAt = item.CreatedAt,
+            ModifiedAt = item.ModifiedAt,
+        };
     }
 
     public async Task<ItemDTO> CreateItemAsync(ItemDTO itemDto, int collectionId)
@@ -51,8 +63,16 @@ public class ItemsService : IItemsService
         
         await _collectionsService.AddItemToCollectionAsync(item.ItemId, collectionId);
         
-        
-        return item.ToItemDTO();
+        return new ItemDTO
+        {
+            ItemId = item.ItemId,
+            ItemName = item.ItemName,
+            ItemDescription = item.ItemDescription,
+            ItemUrl = item.ItemUrl,
+            CollectionId = item.CollectionId,
+            CreatedAt = item.CreatedAt,
+            ModifiedAt = item.ModifiedAt,
+        };
     }
 
     public async Task<ItemDTO> UpdateCollectionAsync(ItemDTO itemDto)

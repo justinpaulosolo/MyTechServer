@@ -13,21 +13,9 @@ public class Item
 
     // Foreign Key for the collection
     public string UserId { get; set; } = string.Empty;
+    public int CollectionId { get; set; }
 
     // Navigation Property
     public User User { get; set; } = null!;
-    public ICollection<CollectionItem> CollectionItems { get; set; } = new List<CollectionItem>();
-    
-    public ItemDTO ToItemDTO()
-    {
-        return new ItemDTO()
-        {
-            ItemId = ItemId,
-            ItemName = ItemName,
-            ItemUrl = ItemUrl,
-            ItemDescription = ItemDescription,
-            CreatedAt = CreatedAt,
-            ModifiedAt = ModifiedAt
-        };
-    }
+    public Collection Collection { get; set; } = null!;
 }

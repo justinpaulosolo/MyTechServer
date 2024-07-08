@@ -161,36 +161,29 @@ namespace MyTech.Data.Migrations
                     b.Property<DateTime>("ModifiedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("ParentCollectionId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("CollectionId");
 
+                    b.HasIndex("ParentCollectionId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Collections");
-                });
-
-            modelBuilder.Entity("MyTech.Domain.CollectionItem", b =>
-                {
-                    b.Property<int>("CollectionId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ItemId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("CollectionId", "ItemId");
-
-                    b.HasIndex("ItemId");
-
-                    b.ToTable("CollectionItems");
                 });
 
             modelBuilder.Entity("MyTech.Domain.Item", b =>
                 {
                     b.Property<int>("ItemId")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CollectionId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("CreatedAt")
@@ -216,6 +209,8 @@ namespace MyTech.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("ItemId");
+
+                    b.HasIndex("CollectionId");
 
                     b.HasIndex("UserId");
 
@@ -339,53 +334,45 @@ namespace MyTech.Data.Migrations
 
             modelBuilder.Entity("MyTech.Domain.Collection", b =>
                 {
+                    b.HasOne("MyTech.Domain.Collection", "ParentCollection")
+                        .WithMany("SubCollection")
+                        .HasForeignKey("ParentCollectionId");
+
                     b.HasOne("MyTech.Domain.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ParentCollection");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MyTech.Domain.CollectionItem", b =>
+            modelBuilder.Entity("MyTech.Domain.Item", b =>
                 {
                     b.HasOne("MyTech.Domain.Collection", "Collection")
-                        .WithMany("CollectionItems")
+                        .WithMany("Items")
                         .HasForeignKey("CollectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MyTech.Domain.Item", "Item")
-                        .WithMany("CollectionItems")
-                        .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Collection");
-
-                    b.Navigation("Item");
-                });
-
-            modelBuilder.Entity("MyTech.Domain.Item", b =>
-                {
                     b.HasOne("MyTech.Domain.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Collection");
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("MyTech.Domain.Collection", b =>
                 {
-                    b.Navigation("CollectionItems");
-                });
+                    b.Navigation("Items");
 
-            modelBuilder.Entity("MyTech.Domain.Item", b =>
-                {
-                    b.Navigation("CollectionItems");
+                    b.Navigation("SubCollection");
                 });
 #pragma warning restore 612, 618
         }
