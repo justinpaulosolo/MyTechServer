@@ -1,4 +1,5 @@
 using MyTech.Data;
+using MyTech.Domain;
 using MyTech.DTOs;
 
 namespace MyTech.Services;
@@ -29,7 +30,16 @@ public class CollectionsService(ApplicationDbContext context) : ICollectionsServ
 
     public async Task<CollectionDTO> CreateCollectionAsync(CollectionDTO collectionDto)
     {
-        throw new NotImplementedException();
+        var collection = new Collection
+        {
+            CollectionName = collectionDto.CollectionName,
+            UserId = collectionDto.UserId
+        };
+        
+        await _context.Collections.AddAsync(collection);
+        await _context.SaveChangesAsync();
+        
+        return collection.ToCollectionDTO();
     }
 
     public async Task<CollectionDTO> UpdateCollectionAsync(CollectionDTO collectionDto)

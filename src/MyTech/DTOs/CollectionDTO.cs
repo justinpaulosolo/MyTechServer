@@ -6,5 +6,6 @@ public class CollectionDTO
     public string CollectionName { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public DateTime ModifiedAt { get; set; }
-    public List<int> ItemsIds { get; set; }
+    public string UserId { get; set; } = string.Empty;
+    public List<int> ItemsIds { get; set; } = [];
 }

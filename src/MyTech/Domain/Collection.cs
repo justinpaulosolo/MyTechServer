@@ -1,3 +1,5 @@
+using MyTech.DTOs;
+
 namespace MyTech.Domain;
 
 public class Collection
@@ -13,4 +15,16 @@ public class Collection
     // Navigation Property
     public User User { get; set; } = null!;
     public ICollection<CollectionItem> CollectionItems { get; set; } = new List<CollectionItem>();
+
+    public CollectionDTO ToCollectionDTO()
+    {
+        return new CollectionDTO
+        {
+            CollectionId = CollectionId,
+            CollectionName = CollectionName,
+            CreatedAt = CreatedAt,
+            ModifiedAt = ModifiedAt,
+            UserId = UserId
+        };
+    }
 }
