@@ -3,7 +3,7 @@ using MyTech.DTOs;
 
 namespace MyTech.Services;
 
-public interface ICollectionService
+public interface ICollectionsService
 {
     Task<IEnumerable<CollectionDTO>> GetCollectionAsync();
     Task<CollectionDTO> GetCollectionByIdAsync(int id);
@@ -12,7 +12,7 @@ public interface ICollectionService
     Task DeleteCollectionAsync(int id);
 }
 
-public class CollectionService(ApplicationDbContext context) : ICollectionService
+public class CollectionsService(ApplicationDbContext context) : ICollectionsService
 {
     private readonly ApplicationDbContext _context = context;
 
