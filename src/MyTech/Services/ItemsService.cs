@@ -8,7 +8,7 @@ public interface IItemsService
 {
     Task<IEnumerable<ItemDTO>> GetCollectionAsync();
     Task<ItemDTO?> GetItemByIdAsync(int id);
-    Task<ItemDTO> CreateItemAsync(ItemDTO itemDto);
+    Task<ItemDTO> CreateItemAsync(ItemDTO itemDto, int collectionId);
     Task<ItemDTO> UpdateCollectionAsync(ItemDTO itemDto);
     Task DeleteCollectionAsync(int id);
 }
@@ -16,10 +16,12 @@ public interface IItemsService
 public class ItemsService : IItemsService
 {
     private readonly ApplicationDbContext _context;
+    private readonly ICollectionsService _collectionsService;
 
-    public ItemsService(ApplicationDbContext context)
+    public ItemsService(ApplicationDbContext context, ICollectionsService collectionsService)
     {
         _context = context;
+        _collectionsService = collectionsService;
     }
     
     public async Task<IEnumerable<ItemDTO>> GetCollectionAsync()
@@ -34,7 +36,7 @@ public class ItemsService : IItemsService
         return item?.ToItemDTO();
     }
 
-    public async Task<ItemDTO> CreateItemAsync(ItemDTO itemDto)
+    public async Task<ItemDTO> CreateItemAsync(ItemDTO itemDto, int collectionId)
     {
         var item = new Item
         {
@@ -46,6 +48,9 @@ public class ItemsService : IItemsService
         
         await _context.Items.AddAsync(item);
         await _context.SaveChangesAsync();
+        
+        await _collectionsService.AddItemToCollectionAsync(item.ItemId, collectionId);
+        
         
         return item.ToItemDTO();
     }

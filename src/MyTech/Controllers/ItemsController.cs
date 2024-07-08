@@ -41,9 +41,9 @@ public class ItemsController : ControllerBase
             UserId = user.Id
         };
         
-        var createdItem = await _itemsService.CreateItemAsync(item);
+        var createdItem = await _itemsService.CreateItemAsync(item, request.CollectionId);
         
-        return CreatedAtAction(nameof(GetItem), new {id = createdItem}, createdItem);
+        return CreatedAtAction(nameof(GetItem), new {id = createdItem.ItemId}, createdItem);
     }
 
     [HttpGet("{id:int}")]
