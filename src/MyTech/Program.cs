@@ -12,7 +12,10 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddIdentityApiEndpoints<User>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
 builder.Services.AddScoped<ICollectionsService, CollectionsService>();
+builder.Services.AddScoped<IItemsService, ItemsService>();
+
 builder.Services.AddControllers();
 var app = builder.Build();
 
