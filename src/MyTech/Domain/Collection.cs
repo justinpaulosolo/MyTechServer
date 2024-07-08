@@ -4,7 +4,6 @@ public class Collection
 {
     public int CollectionId { get; set; }
     public string CollectionName { get; set; } = string.Empty;
-    public List<Item> Items { get; set; } = [];
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime ModifiedAt { get; set; } = DateTime.UtcNow;
     

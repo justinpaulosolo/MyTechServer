@@ -34,10 +34,9 @@ public class CollectionsController : ControllerBase
         var collection = new CollectionDTO
         {
             CollectionName = request.Name,
-            UserId = user.Id
         };
         
-        var createdCollection = await _collectionsService.CreateCollectionAsync(collection);
+        var createdCollection = await _collectionsService.CreateCollectionAsync(collection, user.Id);
         
         return CreatedAtAction(nameof(GetCollection), new {id = createdCollection.CollectionId}, createdCollection);
     }

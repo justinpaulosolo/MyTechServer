@@ -9,7 +9,7 @@ public interface ICollectionsService
 {
     Task<IEnumerable<CollectionDTO>> GetCollectionAsync();
     Task<CollectionDTO?> GetCollectionByIdAsync(int id);
-    Task<CollectionDTO> CreateCollectionAsync(CollectionDTO collectionDto);
+    Task<CollectionDTO> CreateCollectionAsync(CollectionDTO collectionDto, string userId);
     Task<CollectionDTO> UpdateCollectionAsync(CollectionDTO collectionDto);
     Task<ItemDTO> AddItemToCollectionAsync(int itemId, int collectionId);
     Task DeleteCollectionAsync(int id);
@@ -32,8 +32,10 @@ public class CollectionsService : ICollectionsService
     public async Task<CollectionDTO?> GetCollectionByIdAsync(int id)
     {
         var collection = await _context.Collections
+            .Include(c => c.ParentCollection)
+            .Include(c => c.SubCollection)
             .Include(c => c.CollectionItems)
-            .Include(c => c.Items)
+            .ThenInclude(ci => ci.Item)
             .FirstOrDefaultAsync(c => c.CollectionId == id);
         
         if (collection == null)
@@ -49,12 +51,12 @@ public class CollectionsService : ICollectionsService
         };
     }
 
-    public async Task<CollectionDTO> CreateCollectionAsync(CollectionDTO collectionDto)
+    public async Task<CollectionDTO> CreateCollectionAsync(CollectionDTO collectionDto, string userId)
     {
         var collection = new Collection
         {
             CollectionName = collectionDto.CollectionName,
-            UserId = collectionDto.UserId
+            UserId = userId
         };
         
         await _context.Collections.AddAsync(collection);
@@ -77,7 +79,7 @@ public class CollectionsService : ICollectionsService
     public async Task<ItemDTO> AddItemToCollectionAsync(int itemId, int collectionId)
     {
         var collection = await _context.Collections
-            .Include(c => c.Items)
+            .Include(c => c.CollectionItems)
             .FirstOrDefaultAsync(c => c.CollectionId == collectionId);
         
         var item = await _context.Items.FirstOrDefaultAsync(i => i.ItemId == itemId);
@@ -88,9 +90,9 @@ public class CollectionsService : ICollectionsService
         if (item == null)
             throw new InvalidOperationException("Item not found");
         
-        if (collection.Items.Contains(item))
+        if (collection.CollectionItems.Any(i => i.ItemId == item.ItemId))
             throw new InvalidOperationException("Item already exists in collection");
-
+        
         var collectionItem = new CollectionItem
         {
             CollectionId = collection.CollectionId,
