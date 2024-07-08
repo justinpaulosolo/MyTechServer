@@ -12,6 +12,25 @@ public class ApplicationDbContext : IdentityDbContext<User>
     
     public DbSet<Collection> Collections { get; set; } = null!;
     public DbSet<Item> Items { get; set; } = null!;
+    public DbSet<CollectionItem> CollectionItems { get; set; } = null!;
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        
+        modelBuilder.Entity<CollectionItem>()
+            .HasKey(ci => new { ci.CollectionId, ci.ItemId });
+        
+        modelBuilder.Entity<CollectionItem>()
+            .HasOne(ci => ci.Collection)
+            .WithMany(c => c.CollectionItems)
+            .HasForeignKey(ci => ci.CollectionId);
+        
+        modelBuilder.Entity<CollectionItem>()
+            .HasOne(ci => ci.Item)
+            .WithMany(i => i.CollectionItems)
+            .HasForeignKey(ci => ci.ItemId);
+    }
     
     public override int SaveChanges()
     {

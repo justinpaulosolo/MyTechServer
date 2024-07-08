@@ -43,6 +43,8 @@ public class ItemsController : ControllerBase
         
         var createdItem = await _itemsService.CreateItemAsync(item, request.CollectionId);
         
+        await _collectionsService.AddItemToCollectionAsync(createdItem.ItemId, request.CollectionId);
+        
         return CreatedAtAction(nameof(GetItem), new {id = createdItem.ItemId}, createdItem);
     }
 

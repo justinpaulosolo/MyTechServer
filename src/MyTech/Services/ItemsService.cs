@@ -16,12 +16,10 @@ public interface IItemsService
 public class ItemsService : IItemsService
 {
     private readonly ApplicationDbContext _context;
-    private readonly ICollectionsService _collectionsService;
 
     public ItemsService(ApplicationDbContext context, ICollectionsService collectionsService)
     {
         _context = context;
-        _collectionsService = collectionsService;
     }
     
     public async Task<IEnumerable<ItemDTO>> GetCollectionAsync()
@@ -42,7 +40,6 @@ public class ItemsService : IItemsService
             ItemName = item.ItemName,
             ItemDescription = item.ItemDescription,
             ItemUrl = item.ItemUrl,
-            CollectionId = item.CollectionId,
             CreatedAt = item.CreatedAt,
             ModifiedAt = item.ModifiedAt,
         };
@@ -61,15 +58,12 @@ public class ItemsService : IItemsService
         await _context.Items.AddAsync(item);
         await _context.SaveChangesAsync();
         
-        await _collectionsService.AddItemToCollectionAsync(item.ItemId, collectionId);
-        
         return new ItemDTO
         {
             ItemId = item.ItemId,
             ItemName = item.ItemName,
             ItemDescription = item.ItemDescription,
             ItemUrl = item.ItemUrl,
-            CollectionId = item.CollectionId,
             CreatedAt = item.CreatedAt,
             ModifiedAt = item.ModifiedAt,
         };

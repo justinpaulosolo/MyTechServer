@@ -9,11 +9,16 @@ namespace MyTech.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CollectionsController(ICollectionsService collectionsService, UserManager<User> userManager)
-    : ControllerBase
+public class CollectionsController : ControllerBase
 {
-    private readonly ICollectionsService _collectionsService = collectionsService;
-    private readonly UserManager<User> _userManager = userManager;
+    private readonly ICollectionsService _collectionsService;
+    private readonly UserManager<User> _userManager;
+    
+    public CollectionsController(ICollectionsService collectionsService, UserManager<User> userManager)
+    {
+        _collectionsService = collectionsService;
+        _userManager = userManager;
+    }
     
     [HttpPost]
     [Authorize]

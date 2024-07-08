@@ -15,11 +15,15 @@ public interface ICollectionsService
     Task DeleteCollectionAsync(int id);
 }
 
-public class CollectionsService(ApplicationDbContext context) : ICollectionsService
+public class CollectionsService : ICollectionsService
 {
-    private readonly ApplicationDbContext _context = context;
-
-
+    private readonly ApplicationDbContext _context;
+    
+    public CollectionsService(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+    
     public async Task<IEnumerable<CollectionDTO>> GetCollectionAsync()
     {
         throw new NotImplementedException();
@@ -27,7 +31,10 @@ public class CollectionsService(ApplicationDbContext context) : ICollectionsServ
 
     public async Task<CollectionDTO?> GetCollectionByIdAsync(int id)
     {
-        var collection = await _context.Collections.FindAsync(id);
+        var collection = await _context.Collections
+            .Include(c => c.CollectionItems)
+            .Include(c => c.Items)
+            .FirstOrDefaultAsync(c => c.CollectionId == id);
         
         if (collection == null)
             return null;
@@ -38,6 +45,7 @@ public class CollectionsService(ApplicationDbContext context) : ICollectionsServ
             CollectionName = collection.CollectionName,
             CreatedAt = collection.CreatedAt,
             ModifiedAt = collection.ModifiedAt,
+            ItemsIds = collection.CollectionItems.Select(i => i.ItemId).ToList()
         };
     }
 
@@ -68,7 +76,8 @@ public class CollectionsService(ApplicationDbContext context) : ICollectionsServ
 
     public async Task<ItemDTO> AddItemToCollectionAsync(int itemId, int collectionId)
     {
-        var collection = await _context.Collections.Include(c => c.Items)
+        var collection = await _context.Collections
+            .Include(c => c.Items)
             .FirstOrDefaultAsync(c => c.CollectionId == collectionId);
         
         var item = await _context.Items.FirstOrDefaultAsync(i => i.ItemId == itemId);
@@ -79,9 +88,19 @@ public class CollectionsService(ApplicationDbContext context) : ICollectionsServ
         if (item == null)
             throw new InvalidOperationException("Item not found");
         
-        collection.Items.Add(item);
+        if (collection.Items.Contains(item))
+            throw new InvalidOperationException("Item already exists in collection");
+
+        var collectionItem = new CollectionItem
+        {
+            CollectionId = collection.CollectionId,
+            ItemId = item.ItemId
+        };
         
+        await _context.CollectionItems.AddAsync(collectionItem);
         await _context.SaveChangesAsync();
+        
+        collection.CollectionItems.Add(collectionItem);
         
         return new ItemDTO
         {

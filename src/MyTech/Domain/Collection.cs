@@ -1,5 +1,3 @@
-using MyTech.DTOs;
-
 namespace MyTech.Domain;
 
 public class Collection
@@ -20,4 +18,5 @@ public class Collection
     public User User { get; set; } = null!;
     public Collection ParentCollection { get; set; }
     public List<Collection> SubCollection { get; set; } = [];
+    public ICollection<CollectionItem> CollectionItems { get; set; } = [];
 }

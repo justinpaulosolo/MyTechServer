@@ -1,5 +1,3 @@
-using MyTech.DTOs;
-
 namespace MyTech.Domain;
 
 public class Item
@@ -13,9 +11,8 @@ public class Item
 
     // Foreign Key for the collection
     public string UserId { get; set; } = string.Empty;
-    public int CollectionId { get; set; }
 
     // Navigation Property
     public User User { get; set; } = null!;
-    public Collection Collection { get; set; } = null!;
+    public ICollection<CollectionItem> CollectionItems { get; set; } = [];
 }
